@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>游戏大厂模拟器</title>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+    background: #f8fafc; 
+    color: #0f172a; 
+    line-height: 1.5; 
+    overflow-x: hidden; 
+}
+
+/* 开始屏幕 */
+.start-screen { 
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    padding: 1rem;
+}
+.start-box { 
+    background: white; 
+    padding: 1.5rem; 
+    border-radius: 20px; 
+    max-width: 500px; 
+    width: 100%; 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.title { 
+    font-size: 2rem; 
+    font-weight: 900; 
+    background: linear-gradient(135deg, #2563eb, #7c3aed); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+    margin-bottom: 0.5rem; 
+    text-align: center; 
+}
+.subtitle { 
+    color: #64748b; 
+    text-align: center; 
+    margin-bottom: 1rem; 
+    font-size: 0.9rem; 
+}
+
+/* 游戏说明 */
+.rules {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    line-height: 1.8;
+}
+.rules h3 {
+    color: #2563eb;
+    font-size: 0.95rem;
+    margin: 0.8rem 0 0.5rem;
+}
+.rules h3:first-child {
+    margin-top: 0;
+}
+.rules ul {
+    padding-left: 1.2rem;
+    margin: 0.3rem 0;
+}
+.rules li {
+    margin: 0.2rem 0;
+    color: #64748b;
+}
+.rules .highlight {
+    color: #dc2626;
+    font-weight: 700;
+}
+.rules .success {
+    color: #16a34a;
+    font-weight: 700;
+}
+
+.btn { 
+    width: 100%; 
+    padding: 1rem; 
+    font-size: 1rem; 
+    font-weight: 700; 
+    border: none; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    margin-bottom: 0.8rem; 
+}
+.btn-primary { 
+    background: linear-gradient(135deg, #2563eb, #7c3aed); 
+    color: white; 
+}
+
+/* 游戏屏幕 */
+.game-screen { 
+    display: none; 
+    padding-bottom: 70px; 
+}
+.game-screen.active { 
+    display: block; 
+}
+
+/* 顶部栏 */
+.top-bar { 
+    position: sticky; 
+    top: 0; 
+    background: white; 
+    border-bottom: 1px solid #e2e8f0; 
+    padding: 0.6rem 1rem; 
+    z-index: 100; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+}
+.top-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 0.4rem; 
+}
+.career-level { 
+    font-size: 1rem; 
+    font-weight: 900; 
+    background: linear-gradient(135deg, #f59e0b, #db2777); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+}
+.career-title { 
+    font-size: 0.7rem; 
+    color: #64748b; 
+}
+.quarter { 
+    font-size: 1.2rem; 
+    font-weight: 900; 
+    color: #f59e0b; 
+    line-height: 1; 
+}
+.year { 
+    font-size: 0.65rem; 
+    color: #64748b; 
+}
+.stats-mini { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 0.4rem; 
+    font-size: 0.65rem; 
+}
+.stat-mini { 
+    text-align: center; 
+}
+.stat-mini-val { 
+    font-weight: 700; 
+    display: block; 
+    font-size: 0.75rem;
+}
+.stat-mini-lbl { 
+    color: #64748b; 
+    font-size: 0.6rem; 
+}
+
+/* 内容区 */
+.content { 
+    padding: 1rem; 
+}
+
+/* 数值卡片 - 分类显示 */
+.stats-section {
+    margin-bottom: 0.8rem;
+}
+.stats-compact {
+    background: white;
+    border-radius: 12px;
+    padding: 0.8rem;
+    margin-bottom: 0.6rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.stats-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.team-title {
+    color: #dc2626;
+}
+.product-title {
+    color: #16a34a;
+}
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+.stat-item {
+    padding: 0.4rem;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.3rem;
+}
+.stat-label {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+.stat-value {
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+.stat-max {
+    font-size: 0.7rem;
+    color: #94a3b8;
+}
+.stat-bar {
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    overflow: hidden;
+}
+.stat-fill {
+    height: 100%;
+    transition: width 0.5s;
+}
+
+/* 续命机制按钮 */
+.survival-btn {
+    background: linear-gradient(135deg, #f59e0b, #dc2626);
+    color: white;
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(220,38,38,0.2);
+}
+.survival-btn:active {
+    transform: scale(0.95);
+}
+
+/* 续命选项 */
+.survival-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.survival-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 0.8rem;
+    text-align: center;
+}
+.survival-desc {
+    font-size: 0.85rem;
+    color: #64748b;
+    text-align: center;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+.survival-option {
+    background: linear-gradient(135deg, rgba(220,38,38,0.05), rgba(245,158,11,0.05));
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.8rem;
+    margin-bottom: 0.6rem;
+    cursor: pointer;
+}
+.survival-option:active {
+    border-color: #dc2626;
+    transform: scale(0.98);
+}
+.survival-option-title {
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 0.3rem;
+    font-size: 0.95rem;
+}
+.survival-option-desc {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+}
+
+/* 决策卡片 */
+.card { 
+    background: white; 
+    border-radius: 12px; 
+    padding: 1rem; 
+    margin-bottom: 1rem; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); 
+}
+.card h3 { 
+    margin-bottom: 0.8rem; 
+    font-size: 1.05rem;
+    color: #2563eb;
+}
+.choice { 
+    background: #f8fafc; 
+    border: 2px solid #e2e8f0; 
+    border-radius: 10px; 
+    padding: 0.8rem; 
+    margin-bottom: 0.6rem; 
+    cursor: pointer; 
+}
+.choice:active {
+    border-color: #2563eb;
+    transform: scale(0.98);
+}
+.choice-label { 
+    font-weight: 700; 
+    color: #2563eb; 
+    margin-bottom: 0.3rem; 
+    font-size: 0.95rem;
+}
+.choice-desc { 
+    font-size: 0.8rem; 
+    color: #64748b; 
+    margin-bottom: 0.6rem; 
+    line-height: 1.5;
+}
+.choice-effects { 
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.effects-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    align-items: center;
+}
+.effects-label {
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 600;
+    margin-right: 0.3rem;
+}
+.effect-tag { 
+    padding: 0.2rem 0.4rem; 
+    border-radius: 4px; 
+    font-size: 0.65rem; 
+    font-weight: 600; 
+}
+.effect-positive { 
+    background: rgba(22,163,74,0.15); 
+    color: #16a34a; 
+}
+.effect-negative { 
+    background: rgba(220,38,38,0.15); 
+    color: #dc2626; 
+}
+
+/* 对话浮层 */
+.dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+}
+.dialog-overlay.active {
+    display: flex;
+}
+.dialog-box {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px 20px 0 0;
+    max-height: 75vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease-out;
+}
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+.dialog-header {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+}
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 0.8rem;
+    flex-shrink: 0;
+}
+.speaker-info {
+    flex: 1;
+}
+.speaker-name {
+    font-weight: 700;
+    font-size: 1rem;
+}
+.speaker-title {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+.dialog-content {
+    padding: 1rem;
+}
+.dialog-text {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+    font-size: 0.9rem;
+}
+.dialog-choices {
+    padding: 0 1rem 1rem;
+}
+
+/* 底部导航 */
+.bottom-nav { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    right: 0; 
+    background: white; 
+    border-top: 1px solid #e2e8f0; 
+    display: flex; 
+    z-index: 100; 
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05); 
+}
+.nav-item { 
+    flex: 1; 
+    padding: 0.7rem 0.5rem; 
+    text-align: center; 
+    border: none; 
+    background: none; 
+    color: #64748b; 
+    cursor: pointer; 
+    font-size: 0.7rem; 
+}
+.nav-item.active { 
+    color: #2563eb; 
+    background: rgba(37,99,235,0.05); 
+}
+.nav-icon { 
+    font-size: 1.2rem; 
+    display: block; 
+    margin-bottom: 0.2rem; 
+}
+
+/* 项目命名 */
+.naming-box { 
+    background: white; 
+    border-radius: 12px; 
+    padding: 1.2rem; 
+    margin-bottom: 1rem; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.naming-title { 
+    font-size: 1.1rem; 
+    font-weight: 700; 
+    margin-bottom: 0.8rem; 
+    text-align: center;
+    color: #2563eb;
+}
+.name-input { 
+    width: 100%; 
+    padding: 0.8rem; 
+    border: 2px solid #e2e8f0; 
+    border-radius: 10px; 
+    font-size: 1rem; 
+    margin-bottom: 0.6rem; 
+}
+.btn-secondary {
+    background: #f8fafc;
+    color: #0f172a;
+    border: 2px solid #e2e8f0;
+}
+
+/* 年度总结 */
+.year-end { 
+    background: white; 
+    border-radius: 16px; 
+    padding: 1.5rem; 
+    margin-bottom: 1rem;
+    text-align: center; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.year-end-title { 
+    font-size: 1.3rem; 
+    font-weight: 700; 
+    margin-bottom: 0.5rem; 
+}
+.year-end-metrics { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 0.8rem; 
+    margin: 1rem 0; 
+}
+.year-metric { 
+    background: #f8fafc; 
+    padding: 0.8rem; 
+    border-radius: 10px; 
+}
+.year-metric-val { 
+    font-size: 1.3rem; 
+    font-weight: 900; 
+    background: linear-gradient(135deg, #2563eb, #7c3aed); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+}
+.year-metric-lbl { 
+    font-size: 0.75rem; 
+    color: #64748b; 
+    margin-bottom: 0.3rem; 
+}
+
+/* 产品列表 */
+.product-card {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.8rem;
+    margin-bottom: 0.6rem;
+}
+.product-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+.product-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+.product-status {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+.status-live {
+    background: rgba(22,163,74,0.1);
+    color: #16a34a;
+}
+
+/* 运营决策 */
+.op-product-header {
+    background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(124,58,237,0.1));
+    border-radius: 10px;
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+.op-product-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+.op-product-stats {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+/* 滑块交易系统 */
+.trade-selector {
+    margin: 1rem 0;
+}
+.selector-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+.selector-row label {
+    min-width: 60px;
+    font-weight: 700;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+.trade-select {
+    flex: 1;
+    padding: 0.6rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: white;
+}
+.current-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(37,99,235,0.05), rgba(124,58,237,0.05));
+    border-radius: 10px;
+}
+.stat-display {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+.stat-display strong {
+    color: #0f172a;
+    font-size: 1rem;
+}
+.stat-emoji {
+    font-size: 1.1rem;
+}
+
+.hidden { 
+    display: none !important; 
+}
+    </style>
+</head>
+<body>
+
+<!-- 开始屏幕 -->
+<div class="start-screen" id="startScreen">
+    <div class="start-box">
+        <h1 class="title">游戏大厂模拟器</h1>
+        <p class="subtitle">从主策划到工作室总裁的晋升之路</p>
+        
+        <div class="rules">
+            <h3>🎮 游戏目标</h3>
+            <ul>
+                <li>从L1-1主策划开始,逐步晋升到L4-1工作室总裁</li>
+                <li>每年开发一款新游戏,运营已上线产品</li>
+                <li>达到收入和用户目标后即可晋升</li>
+            </ul>
+            
+            <h3>💀 生死线机制</h3>
+            <ul>
+                <li><span class="highlight">任意数值归零 = 游戏结束</span></li>
+                <li>团队数值:士气、信任、现金、发量</li>
+                <li>产品数值:期待、创新、可玩性、商业化</li>
+            </ul>
+            
+            <h3>⚡ 续命机制(救命稻草!)</h3>
+            <ul>
+                <li><span class="success">危急时刻可以用一个数值换另一个</span></li>
+                <li>996加班:用发量换士气(自己上,兄弟们歇歇)</li>
+                <li>向上画饼:用士气换信任(老板你看我多努力)</li>
+                <li>刷老板卡:用信任换现金(再借点预算吧)</li>
+                <li>抠抠搜搜:用现金换发量(省钱买生发水)</li>
+                <li><span class="highlight">每次交换会损失30%!</span></li>
+            </ul>
+            
+            <h3>📈 成长机制</h3>
+            <ul>
+                <li>每成功一款产品,数值上限提升35%</li>
+                <li>但决策影响也会增大15%</li>
+                <li>越往后越难,需要更谨慎决策</li>
+            </ul>
+            
+            <h3>⚖️ 核心玩法</h3>
+            <ul>
+                <li>每季度:突发事件 → 新产品开发 → 成熟产品运营</li>
+                <li>绿色=加分,红色=减分,权衡利弊</li>
+            </ul>
+        </div>
+        
+        <button class="btn btn-primary" id="startBtn">开始卷了</button>
+    </div>
+</div>
+
+<!-- 游戏屏幕 -->
+<div class="game-screen" id="gameScreen">
+    <!-- 顶部状态栏 -->
+    <div class="top-bar">
+        <div class="top-row">
+            <div>
+                <div class="career-level" id="careerLevel">L1-1</div>
+                <div class="career-title" id="careerTitle">主策划</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="quarter" id="quarter">Q1</div>
+                <div class="year">第<span id="year">1</span>年</div>
+            </div>
+        </div>
+        <div class="stats-mini">
+            <div class="stat-mini">
+                <span class="stat-mini-val" id="miniRev">0</span>
+                <span class="stat-mini-lbl">总收入</span>
+            </div>
+            <div class="stat-mini">
+                <span class="stat-mini-val" id="miniUsers">0</span>
+                <span class="stat-mini-lbl">总用户</span>
+            </div>
+            <div class="stat-mini">
+                <span class="stat-mini-val" id="miniProducts">0</span>
+                <span class="stat-mini-lbl">在线产品</span>
+            </div>
+            <div class="stat-mini">
+                <span class="stat-mini-val" id="miniQRev">0</span>
+                <span class="stat-mini-lbl">季度收入</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="content">
+        <div id="mainContent"></div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <button class="nav-item active" id="navDecision">
+            <span class="nav-icon">🔧</span>
+            新产品开发
+        </button>
+        <button class="nav-item" id="navProducts">
+            <span class="nav-icon">📦</span>
+            成熟产品运营
+        </button>
+        <button class="nav-item hidden" id="navOperation">
+            <span class="nav-icon">📈</span>
+            成熟产品运营
+        </button>
+    </div>
+</div>
+
+<!-- 对话浮层 -->
+<div class="dialog-overlay" id="dialogOverlay">
+    <div class="dialog-box">
+        <div class="dialog-header">
+            <div class="avatar" id="dialogAvatar">👤</div>
+            <div class="speaker-info">
+                <div class="speaker-name" id="speakerName">张三</div>
+                <div class="speaker-title" id="speakerTitle">CEO</div>
+            </div>
+        </div>
+        <div class="dialog-content">
+            <div class="dialog-text" id="dialogText"></div>
+        </div>
+        <div class="dialog-choices" id="dialogChoices"></div>
+    </div>
+</div>
+
+<script>
+// 游戏数据
+var LEVELS = {
+    'L1-1': {title:'主策划',next:'L1-2',rev:3000,users:150},
+    'L1-2': {title:'执行制作人',next:'L2-1',rev:10000,users:500},
+    'L2-1': {title:'副制作人',next:'L2-2',rev:30000,users:1500}
+};
+
+var TYPES = {
+    '二次元卡牌':{userMul:1.2,revMul:1.5,life:80,decay:12},
+    'MMORPG':{userMul:0.6,revMul:2.5,life:150,decay:6},
+    '休闲三消':{userMul:2.0,revMul:0.6,life:60,decay:15}
+};
+
+var NAME_PREFIXES = ['梦幻','赛博','星际','末日','魔法','战国','暗黑','像素','放置'];
+var NAME_SUFFIXES = ['仙侠','朋克2099','征服','求生','学院','风云','地牢','冒险','仙途'];
+
+// 对话人物
+var CHARACTERS = {
+    ceo: {name:'李总',title:'CEO / 天天改需求',avatar:'👔'},
+    lead_designer: {name:'王策',title:'主策划 / 灵魂人物',avatar:'🎨'},
+    lead_dev: {name:'张程',title:'主程序 / 技术大牛',avatar:'💻'},
+    investor: {name:'投资方',title:'董事 / 钱袋子',avatar:'💼'},
+    competitor: {name:'隔壁老王',title:'竞对制作人',avatar:'⚔️'},
+    media: {name:'游戏媒体',title:'IGN记者',avatar:'📰'},
+    player: {name:'玩家代表',title:'氪金大佬',avatar:'🎮'},
+    hr: {name:'HR小姐姐',title:'人力资源',avatar:'👩'}
+};
+
+// 续命选项
+// 滑块交易文案 - 所有可能的交换组合
+var SURVIVAL_EXCHANGE_MAP = {
+    'morale_trust': {title:'向上画饼', text:'给老板一顿PPT,画饼打鸡血:"李总您看,咱这项目绝对是爆款!"'},
+    'morale_cash': {title:'压榨团队', text:'全员996加班赶进度,省下外包费:"兄弟们,这个月先欠着,下个月一起发!"'},
+    'morale_hair': {title:'强制休假', text:'强制团队去休假保养头发,但士气受挫:"什么?不许加班?我的晋升机会呢?"'},
+    'trust_morale': {title:'发钱收买', text:'刷老板信用卡给团队发奖金:"李总说了,大家辛苦了,每人5000块!"'},
+    'trust_cash': {title:'再刷老板卡', text:'趁老板心情好多报销点:"李总,这个服务器真的很有必要升级..."'},
+    'trust_hair': {title:'申请体检', text:'说服老板给团队做体检和理疗:"李总,咱们关心员工健康,口碑好招人容易!"'},
+    'cash_morale': {title:'团建打鸡血', text:'组织豪华团建:"兄弟们!海底捞走起!KTV唱到天亮!"'},
+    'cash_trust': {title:'数据造假', text:'花钱买漂亮的数据报告给老板看:"李总您看,留存率暴涨30%!"'},
+    'cash_hair': {title:'买生发水', text:'给全员配发霸王防脱洗发水和生发精华:"用了都说好,头发哗哗长!"'},
+    'hair_morale': {title:'亲自下场', text:'自己通宵肝代码,让团队早点下班:"你们先走,这个BUG我今晚搞定!"'},
+    'hair_trust': {title:'诉苦卖惨', text:'顶着秃头去找老板诉苦:"李总您看我这头发,都是为了项目啊..."'},
+    'hair_cash': {title:'以身作则', text:'自己加班省外包费:"我自己搞定,不用花钱找外包了!"'}
+};
+
+var SURVIVAL_OPTIONS = [
+    {
+        title: '996加班续命',
+        desc: '自己上手做,兄弟们先歇歇吧',
+        emoji: '💪',
+        from: 'hair',
+        to: 'morale',
+        fromLabel: '发量',
+        toLabel: '士气',
+        amount: 30,
+        loss: 0.3
+    },
+    {
+        title: '向上画饼管理',
+        desc: '跟老板汇报下成果,刷刷信任度',
+        emoji: '🎨',
+        from: 'morale',
+        to: 'trust',
+        fromLabel: '士气',
+        toLabel: '信任',
+        amount: 30,
+        loss: 0.3
+    },
+    {
+        title: '再刷老板信用卡',
+        desc: '老板我们需要追加预算...',
+        emoji: '💳',
+        from: 'trust',
+        to: 'cash',
+        fromLabel: '信任',
+        toLabel: '现金',
+        amount: 30,
+        loss: 0.3
+    },
+    {
+        title: '抠抠搜搜过日子',
+        desc: '省钱买生发水,养养头发',
+        emoji: '💰',
+        from: 'cash',
+        to: 'hair',
+        fromLabel: '现金',
+        toLabel: '发量',
+        amount: 30,
+        loss: 0.3
+    },
+    {
+        title: '打鸡血动员大会',
+        desc: '画饼鼓舞士气,但要花钱团建',
+        emoji: '📢',
+        from: 'cash',
+        to: 'morale',
+        fromLabel: '现金',
+        toLabel: '士气',
+        amount: 25,
+        loss: 0.3
+    },
+    {
+        title: '跟老板诉诉苦',
+        desc: '用头发和汗水换老板信任',
+        emoji: '😭',
+        from: 'hair',
+        to: 'trust',
+        fromLabel: '发量',
+        toLabel: '信任',
+        amount: 25,
+        loss: 0.3
+    }
+];
+
+// 突发事件 - 简化为2个数值变化,幅度±5-8
+var EVENTS = [
+    {char:'ceo',text:'老板突然要加新功能:"我昨晚刷抖音看到个摇一摇,咱们也加上!"',choices:[
+        {label:'立即加上',desc:'老板说啥是啥',effects:{trust:7,morale:-6}},
+        {label:'婉转拒绝',desc:'讲道理,可能被穿小鞋',effects:{trust:-7,innovation:5}},
+        {label:'做个假的',desc:'先应付过去',effects:{trust:4,playability:-5}}
+    ]},
+    {char:'lead_designer',text:'主策划要跳槽:"隔壁大厂年薪翻倍挖我,明天就走。"',choices:[
+        {label:'加薪留人',desc:'砸钱留下',effects:{morale:6,cash:-8}},
+        {label:'放他走吧',desc:'培养新人',effects:{morale:-7,cash:5}},
+        {label:'画饼挽留',desc:'承诺未来',effects:{morale:()=>Math.random()>0.4?6:-7,cash:3}}
+    ]},
+    {char:'investor',text:'投资方催促:"友商下月上线,我们必须提前抢窗口期!"',choices:[
+        {label:'996冲刺',desc:'加班赶工',effects:{trust:7,hair:-8}},
+        {label:'据理力争',desc:'坚持质量',effects:{trust:-6,playability:6}},
+        {label:'砍掉功能',desc:'阉割版先上',effects:{trust:5,playability:-7}}
+    ]},
+    {char:'competitor',text:'竞品消息:"隔壁大厂下周上同类游戏,营销预算3个亿。"',choices:[
+        {label:'跟他们刚',desc:'买量硬刚',effects:{hype:7,cash:-8}},
+        {label:'错峰上线',desc:'延期避开',effects:{hype:-6,playability:6}},
+        {label:'佛系应对',desc:'该咋咋地',effects:{morale:5,hype:-6}}
+    ]},
+    {char:'media',text:'游戏媒体唱衰:"这个品类今年已经死了15款了。"',choices:[
+        {label:'紧急转型',desc:'推倒重来',effects:{innovation:7,morale:-8}},
+        {label:'死磕到底',desc:'相信自己',effects:{morale:6,hype:-7}},
+        {label:'加大营销',desc:'砸钱造势',effects:{hype:7,cash:-8}}
+    ]}
+];
+
+// 决策数据(使用V5的Q1-Q4数据,此处省略完整代码)
+var Q1=[{title:"立项答辩 - 确定项目类型",choices:[{label:"二次元卡牌",desc:"老板最爱,商业化吃透了,但同质化严重卷到天上",effects:{hype:2,monetization:4,trust:2,innovation:-4,hair:-2}},{label:"MMORPG",desc:"技术难度拉满,投入巨大,团队天天通宵容易猝死",effects:{innovation:4,hype:4,cash:-8,morale:-4,hair:-6}},{label:"休闲三消",desc:"做起来快预算少,但天花板低老板看不上",effects:{playability:4,morale:2,cash:2,innovation:-6,trust:-4,monetization:-2}}]},{title:"IP授权 - 找个大腿抱",choices:[{label:"买热门IP",desc:"甲方爸爸要价高还管头管脚,创新空间为0",effects:{hype:9,monetization:2,cash:-11,innovation:-9,trust:-4,playability:-2}},{label:"用经典IP",desc:"三国/西游老掉牙,但用户认,做出来就是换皮",effects:{hype:4,monetization:2,cash:-6,innovation:-6,playability:-2,morale:-2}},{label:"搞原创IP",desc:"前期没人鸟你,开发难度大,但成了就是王炸",effects:{innovation:7,monetization:4,hype:-7,trust:-6,hair:-6,cash:-4}}]},{title:"团队组建 - 找人真难",choices:[{label:"挖大厂明星",desc:"能力强简历好看,但薪资高还不稳定容易跑",effects:{innovation:6,playability:4,trust:2,cash:-11,morale:-8,hair:-4}},{label:"校招应届生",desc:"便宜听话有激情,但就是啥都不会试错成本高",effects:{morale:7,cash:4,innovation:2,hair:2,playability:-9,trust:-6}},{label:"全靠外包",desc:"省钱灵活,但质量像屎沟通全靠吼",effects:{cash:4,monetization:2,playability:-10,trust:-7,innovation:-6,morale:-4}}]},{title:"预算规划 - 钱怎么花",choices:[{label:"All in品质",desc:"重金投入追求极致,后期资金链断裂玩完",effects:{innovation:4,playability:7,cash:-10,hair:-7,morale:-6,trust:-2}},{label:"扣扣索索",desc:"能省则省留后路,产品质量稀烂士气低迷",effects:{cash:8,morale:-7,playability:-9,innovation:-6,hype:-4,trust:-4}}]}];
+var Q2=[{title:"玩法设计 - 整点花活",choices:[{label:"创新融合",desc:"融合多个玩法搞创新,风险巨大容易四不像",effects:{innovation:11,playability:4,hype:4,hair:-10,morale:-7,trust:-6,cash:-4}},{label:"抄作业",desc:"借鉴成熟玩法打磨细节,稳但被喷换皮狗",effects:{playability:9,morale:4,trust:2,innovation:-9,hype:-4,monetization:-4}}]},{title:"美术风格 - 要不要卷画质",choices:[{label:"次世代3D",desc:"画面炸裂吸量,但烧钱烧时间优化地狱",effects:{hype:10,playability:4,innovation:2,cash:-13,hair:-12,morale:-8}},{label:"二次元",desc:"纸片人老一套,商业化成熟但创新个鬼",effects:{hype:6,monetization:8,cash:-7,innovation:-7,playability:-2}}]},{title:"技术选型 - 用什么引擎",choices:[{label:"Unity",desc:"成熟好用文档全,但授权费贵大家都在用没差异化",effects:{playability:7,morale:4,cash:-7,innovation:-4,hype:-2}},{label:"自研引擎",desc:"完全自主技术积累,但周期长坑多人跑光",effects:{innovation:12,trust:4,cash:-11,hair:-16,playability:-11,morale:-11}}]},{title:"数值体系 - 让玩家怎么肝",choices:[{label:"重度养成",desc:"深度养成生命周期长,但前期劝退流失高",effects:{playability:7,monetization:9,innovation:2,hype:-7,morale:-4,cash:-2}},{label:"轻度爽游",desc:"爽快吸量数据好看,但内容快速耗尽暴死",effects:{playability:6,hype:7,morale:4,monetization:-9,innovation:-6,trust:-4}}]}];
+var Q3=[{title:"商业化 - 怎么割韭菜",choices:[{label:"氪金深度",desc:"重度付费吸鲸鱼,但口碑暴死被骂死",effects:{monetization:14,cash:6,hype:-14,trust:-10,morale:-8}},{label:"佛系微氪",desc:"轻度付费玩家爽,但收入拉胯老板骂娘",effects:{monetization:4,hype:7,morale:7,trust:4,cash:-6,innovation:-4}}]},{title:"测试调优 - 数据暴雷了",choices:[{label:"推翻重做",desc:"核心玩法全改质量拉满,团队996到崩溃",effects:{playability:12,innovation:7,hair:-16,morale:-16,cash:-12,trust:-9}},{label:"小修小补",desc:"改改数值送送福利,问题还在治标不治本",effects:{playability:4,monetization:2,morale:2,innovation:-6,trust:-7,hype:-4}}]},{title:"内容填充 - 要不要做剧情",choices:[{label:"剧情拉满",desc:"大投入做剧情提升逼格,但成本高周期长",effects:{playability:7,innovation:6,hype:4,cash:-11,hair:-8,morale:-6}},{label:"玩法为王",desc:"只做玩法不做剧情,可玩性强但缺深度",effects:{playability:10,innovation:7,hair:-11,cash:-9,morale:-7,trust:-2}}]},{title:"服务器 - 能不能撑住",choices:[{label:"豪华配置",desc:"顶配服务器体验拉满,但运营成本吓死人",effects:{playability:10,trust:7,cash:-16,morale:-4}},{label:"省钱方案",desc:"弹性方案省成本,但技术复杂随时炸服",effects:{playability:6,innovation:4,cash:-9,hair:-9,trust:-7}}]}];
+var Q4=[{title:"营销策略 - 怎么让人知道",choices:[{label:"买量狂魔",desc:"砸几千万买量冲榜,ROI爆炸可能血亏",effects:{hype:16,cash:-21,trust:-11,morale:-8}},{label:"KOL带货",desc:"找UP主带货搞口碑,起量慢可能凉凉",effects:{hype:10,innovation:4,morale:4,cash:-10,trust:-6,playability:-2}}]},{title:"渠道选择 - 抱谁的大腿",choices:[{label:"大渠道联运",desc:"用户量巨大覆盖全,但分成要50%被薅羊毛",effects:{hype:12,monetization:-12,cash:-8,trust:-8}},{label:"独立发行",desc:"分成低自主权大,但没量营销全靠吼",effects:{monetization:9,innovation:4,morale:4,hype:-6,cash:-6,trust:-7}}]},{title:"上线时机 - 什么时候开服",choices:[{label:"抢跑上线",desc:"提前抢窗口抢用户,但BUG一堆口碑崩",effects:{hype:10,cash:4,playability:-16,trust:-11,hair:-8,morale:-6}},{label:"延期打磨",desc:"继续优化提升品质,但错过窗口期凉凉",effects:{playability:12,innovation:8,hype:-16,cash:-16,hair:-14,trust:-11}}]},{title:"首发活动 - 送不送福利",choices:[{label:"福利狂送",desc:"疯狂送资源留住玩家,但后期付费完蛋",effects:{hype:14,playability:8,morale:8,monetization:-16,cash:-8}},{label:"首发礼包",desc:"重氪礼包快速回本,但舆论爆炸被喷死",effects:{monetization:16,cash:12,hype:-14,trust:-14,morale:-8}}]}];
+
+// 运营策略
+var OPS = [
+    {title:'激进扩张',desc:'砸钱买量做活动冲KPI,用户爆涨但加速衰老快速暴死',effects:{userChange:40,revenueMultiplier:1.35,lifecycleChange:-28,cost:1000}},
+    {title:'稳健长线',desc:'持续更新小步迭代养老玩家,增长慢但活得久',effects:{userChange:10,revenueMultiplier:1.1,lifecycleChange:15,cost:500}},
+    {title:'捞一笔关服',desc:'最后一波强氪礼包收割鲸鱼,赚完就跑立刻暴死',effects:{userChange:-45,revenueMultiplier:2.5,lifecycleChange:-60,cost:200}},
+    {title:'佛系维护',desc:'最低成本日常维护不投入,自然衰退等死',effects:{userChange:-18,revenueMultiplier:0.85,lifecycleChange:-22,cost:100}}
+];
+
+var g = {
+    level:'L1-1',totalRev:0,totalUsers:0,year:1,q:1,actIdx:0,phase:'event',
+    products:[],cur:null,morale:90,trust:90,cash:90,hair:90,
+    hype:60,innovation:60,playability:60,monetization:60,
+    over:false,selType:null,currentNaming:'',inOperation:false,opIdx:0,usedEvents:[],
+    successfulProducts:0,statMultiplier:1.0,effectMultiplier:1.0,
+    teamMax:100,productMax:100,survivalWarned:false
+};
+
+// 事件监听
+document.getElementById('startBtn').addEventListener('click', function() {
+    newGame();
+});
+
+document.getElementById('navDecision').addEventListener('click', function() {
+    if(g.inOperation) return;
+    showTab('decision');
+    // 恢复当前决策界面
+    if(g.phase === 'action') {
+        showActWithStats();
+    } else if(g.phase === 'naming') {
+        showNaming();
+    }
+});
+
+document.getElementById('navProducts').addEventListener('click', function() {
+    showTab('products');
+});
+
+document.getElementById('navOperation').addEventListener('click', function() {
+    if(!g.inOperation) {
+        g.inOperation = true;
+        g.opIdx = 0;
+        showOperation();
+    }
+    showTab('operation');
+});
+
+function newGame() {
+    g = {
+        level:'L1-1',totalRev:0,totalUsers:0,year:1,q:1,actIdx:0,phase:'naming',
+        products:[],cur:null,morale:90,trust:90,cash:90,hair:90,
+        hype:60,innovation:60,playability:60,monetization:60,
+        over:false,selType:null,currentNaming:'',inOperation:false,opIdx:0,usedEvents:[],
+        successfulProducts:0,statMultiplier:1.0,effectMultiplier:1.0,
+        teamMax:100,productMax:100,survivalWarned:false
+    };
+    
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('gameScreen').classList.add('active');
+    
+    updateUI();
+    showNaming();
+}
+
+function showTab(tab) {
+    var navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(function(item) {
+        item.classList.remove('active');
+    });
+    
+    if(tab === 'decision') {
+        document.getElementById('navDecision').classList.add('active');
+    } else if(tab === 'products') {
+        document.getElementById('navProducts').classList.add('active');
+        showProducts();
+    } else if(tab === 'operation') {
+        document.getElementById('navOperation').classList.add('active');
+    }
+}
+
+function showNaming() {
+    var html = '<div class="naming-box">';
+    html += '<div class="naming-title">🎮 新项目立项</div>';
+    html += '<input type="text" class="name-input" id="projectName" placeholder="给你的游戏起个名字吧" value="'+g.currentNaming+'">';
+    html += '<button class="btn btn-secondary" id="rollBtn">🎲 随机生成</button>';
+    html += '<button class="btn btn-primary" id="confirmBtn">确认立项,准备答辩</button>';
+    html += '</div>';
+    document.getElementById('mainContent').innerHTML = html;
+    
+    document.getElementById('rollBtn').addEventListener('click', rollName);
+    document.getElementById('confirmBtn').addEventListener('click', confirmName);
+}
+
+function rollName() {
+    var prefix = NAME_PREFIXES[Math.floor(Math.random()*NAME_PREFIXES.length)];
+    var suffix = NAME_SUFFIXES[Math.floor(Math.random()*NAME_SUFFIXES.length)];
+    g.currentNaming = prefix + suffix;
+    document.getElementById('projectName').value = g.currentNaming;
+}
+
+function confirmName() {
+    var name = document.getElementById('projectName').value.trim();
+    if(!name) { 
+        alert('项目名称不能为空啊老铁!'); 
+        return; 
+    }
+    g.cur = {name:name,status:'dev',type:null,baseU:0,curU:0,baseR:0,curR:0,life:100,maxLife:100,decay:10};
+    g.selType = null;
+    g.phase = 'event';
+    g.actIdx = 0;
+    nextCard();
+}
+
+function nextCard() {
+    if(g.over) return;
+    if(g.phase === 'event') showEventDialog();
+    else if(g.phase === 'action') showActWithStats();
+}
+
+// 显示突发事件对话框
+function showEventDialog() {
+    var availEvents = EVENTS.filter(function(e) {
+        return g.usedEvents.indexOf(e.text) === -1;
+    });
+    if(availEvents.length === 0) g.usedEvents = [];
+    
+    var evt = availEvents[Math.floor(Math.random() * Math.min(availEvents.length, 3))];
+    g.usedEvents.push(evt.text);
+    
+    var char = CHARACTERS[evt.char];
+    document.getElementById('dialogAvatar').textContent = char.avatar;
+    document.getElementById('speakerName').textContent = char.name;
+    document.getElementById('speakerTitle').textContent = char.title;
+    document.getElementById('dialogText').textContent = evt.text;
+    
+    var html = '';
+    for(var i=0; i<evt.choices.length; i++) {
+        var c = evt.choices[i];
+        html += '<div class="choice" data-event-index="'+i+'" data-event-text="'+evt.text.replace(/"/g,'&quot;')+'">';
+        html += '<div class="choice-label">'+c.label+'</div>';
+        html += '<div class="choice-desc">'+c.desc+'</div>';
+        html += '<div class="choice-effects">'+fmtEffSeparate(c.effects)+'</div>';
+        html += '</div>';
+    }
+    document.getElementById('dialogChoices').innerHTML = html;
+    
+    var choices = document.querySelectorAll('#dialogChoices .choice');
+    choices.forEach(function(choice) {
+        choice.addEventListener('click', function() {
+            var idx = parseInt(this.getAttribute('data-event-index'));
+            var text = this.getAttribute('data-event-text');
+            handleEvent(idx, text);
+        });
+    });
+    
+    document.getElementById('dialogOverlay').classList.add('active');
+}
+
+function handleEvent(idx, eventText) {
+    var evt = EVENTS.find(function(e) { return e.text === eventText; });
+    applyEff(evt.choices[idx].effects);
+    
+    document.getElementById('dialogOverlay').classList.remove('active');
+    g.phase = 'action';
+    updateUI();
+    setTimeout(function() { nextCard(); }, 300);
+}
+
+// 决策界面同时显示数值,分类显示团队和产品数值
+function showActWithStats() {
+    var acts = [Q1,Q2,Q3,Q4][g.q-1];
+    if(g.actIdx >= acts.length) { 
+        nextQ(); 
+        return; 
+    }
+    
+    var act = acts[g.actIdx];
+    
+    // 数值卡片 - 分类显示
+    var html = '<div class="stats-section">';
+    
+    // 团队数值
+    html += '<div class="stats-compact">';
+    html += '<div class="stats-title team-title">💀 团队生死线 <span class="stat-max">(上限:'+g.teamMax+')</span></div>';
+    html += '<div class="stats-grid">';
+    html += '<div class="stat-item"><div class="stat-header"><span class="stat-label">😊 士气</span><span class="stat-value">'+g.morale+'</span></div><div class="stat-bar"><div class="stat-fill" style="width:'+(g.morale/g.teamMax*100)+'%;background:linear-gradient(90deg,#dc2626,#f59e0b)"></div></div></div>';
+    html += '<div class="stat-item"><div class="stat-header"><span class="stat-label">🤝 信任</span><span class="stat-value">'+g.trust+'</span></div><div class="stat-bar"><div class="stat-fill" style="width:'+(g.trust/g.teamMax*100)+'%;background:linear-gradient(90deg,#f59e0b,#16a34a)"></div></div></div>';
+    html += '<div class="stat-item"><div class="stat-header"><span class="stat-label">💵 现金</span><span class="stat-value">'+g.cash+'</span></div><div class="stat-bar"><div class="stat-fill" style="width:'+(g.cash/g.teamMax*100)+'%;background:linear-gradient(90deg,#16a34a,#0891b2)"></div></div></div>';
+    html += '<div class="stat-item"><div class="stat-header"><span class="stat-label">💈 发量</span><span class="stat-value">'+g.hair+'</span></div><div class="stat-bar"><div class="stat-fill" style="width:'+(g.hair/g.teamMax*100)+'%;background:linear-gradient(90deg,#2563eb,#7c3aed)"></div></div></div>';
+    html += '</div>';
+    
+    // 续命按钮
+    html += '<div style="margin-top:0.8rem;"><button class="survival-btn" onclick="showSurvivalSlider()">⚡ 数值交易系统</button></div>';
+    html += '</div>';
+    
+    // 产品数值
+    html += '<div class="stats-compact">';
+    html += '<div class="stats-title product-title">🎮 产品成败线 <span class="stat-max">(上限:'+g.productMax+')</span></div>';
+    html += '<div class="stats-grid">';
+    html += '<div class="stat-item"><div class="stat-header"><span class="stat-label">📢 期待</span><span class="stat-value">'+g.hype+'</span></div><div class="stat-bar"><div class="stat-fill" style="width:'+(g.hype/g.productMax*100)+'%;background:linear-gradient(90deg,#7c3aed,#db2777)"></div></div></div>';
+    html += '<div class="stat-item"><div class="stat-header"><span class="stat-label">💡 创新</span><span class="stat-value">'+g.innovation+'</span></div><div class="stat-bar"><div class="stat-fill" style="width:'+(g.innovation/g.productMax*100)+'%;background:linear-gradient(90deg,#0891b2,#16a34a)"></div></div></div>';
+    html += '<div class="stat-item"><div class="stat-header"><span class="stat-label">🎯 可玩性</span><span class="stat-value">'+g.playability+'</span></div><div class="stat-bar"><div class="stat-fill" style="width:'+(g.playability/g.productMax*100)+'%;background:linear-gradient(90deg,#16a34a,#f59e0b)"></div></div></div>';
+    html += '<div class="stat-item"><div class="stat-header"><span class="stat-label">💰 商业化</span><span class="stat-value">'+g.monetization+'</span></div><div class="stat-bar"><div class="stat-fill" style="width:'+(g.monetization/g.productMax*100)+'%;background:linear-gradient(90deg,#f59e0b,#dc2626)"></div></div></div>';
+    html += '</div></div>';
+    
+    html += '</div>';
+    
+    // 决策卡片
+    html += '<div class="card"><h3>'+act.title+'</h3>';
+    
+    for(var i=0; i<act.choices.length; i++) {
+        var c = act.choices[i];
+        html += '<div class="choice" data-index="'+i+'">';
+        html += '<div class="choice-label">'+c.label+'</div>';
+        html += '<div class="choice-desc">'+c.desc+'</div>';
+        html += '<div class="choice-effects">'+fmtEffSeparate(c.effects)+'</div>';
+        html += '</div>';
+    }
+    html += '</div>';
+    
+    document.getElementById('mainContent').innerHTML = html;
+    
+    var choices = document.querySelectorAll('#mainContent .choice');
+    choices.forEach(function(choice) {
+        choice.addEventListener('click', function() {
+            var idx = parseInt(this.getAttribute('data-index'));
+            handleAct(idx);
+        });
+    });
+}
+
+// 显示续命选项
+// 显示滑块交易界面
+function showSurvivalSlider() {
+    var html = '<div class="survival-card">';
+    html += '<div class="survival-title">⚡ 数值交易系统</div>';
+    html += '<div class="survival-desc">选择要交换的数值,拖动滑块设定交易量<br><span style="color:#dc2626;">⚠️ 交易会损失30%!</span></div>';
+    
+    // 当前数值显示
+    html += '<div class="current-stats">';
+    html += '<div class="stat-display"><span class="stat-emoji">😊</span> 士气: <strong>'+g.morale+'</strong></div>';
+    html += '<div class="stat-display"><span class="stat-emoji">🤝</span> 信任: <strong>'+g.trust+'</strong></div>';
+    html += '<div class="stat-display"><span class="stat-emoji">💵</span> 现金: <strong>'+g.cash+'</strong></div>';
+    html += '<div class="stat-display"><span class="stat-emoji">💈</span> 发量: <strong>'+g.hair+'</strong></div>';
+    html += '</div>';
+    
+    // 选择交易数值
+    html += '<div class="trade-selector">';
+    html += '<div class="selector-row">';
+    html += '<label>付出:</label>';
+    html += '<select id="tradeFrom" class="trade-select">';
+    html += '<option value="">选择数值</option>';
+    html += '<option value="morale">😊 士气 ('+g.morale+')</option>';
+    html += '<option value="trust">🤝 信任 ('+g.trust+')</option>';
+    html += '<option value="cash">💵 现金 ('+g.cash+')</option>';
+    html += '<option value="hair">💈 发量 ('+g.hair+')</option>';
+    html += '</select></div>';
+    
+    html += '<div class="selector-row">';
+    html += '<label>获得:</label>';
+    html += '<select id="tradeTo" class="trade-select">';
+    html += '<option value="">选择数值</option>';
+    html += '<option value="morale">😊 士气</option>';
+    html += '<option value="trust">🤝 信任</option>';
+    html += '<option value="cash">💵 现金</option>';
+    html += '<option value="hair">💈 发量</option>';
+    html += '</select></div>';
+    html += '</div>';
+    
+    // 滑块
+    html += '<div id="sliderContainer" class="hidden" style="margin:1rem 0;">';
+    html += '<div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">';
+    html += '<span>交易数量:</span><span id="sliderValue" style="font-weight:700;color:#2563eb;">0</span>';
+    html += '</div>';
+    html += '<input type="range" id="tradeSlider" min="0" max="50" value="0" step="1" style="width:100%;">';
+    html += '<div id="tradePreview" style="margin-top:1rem;padding:1rem;background:#f8fafc;border-radius:8px;"></div>';
+    html += '</div>';
+    
+    html += '<div style="margin-top:1rem;">';
+    html += '<button class="btn btn-primary" id="confirmTradeBtn" disabled>确认交易</button>';
+    html += '<button class="btn btn-secondary" onclick="showActWithStats()">返回</button>';
+    html += '</div>';
+    html += '</div>';
+    
+    document.getElementById('mainContent').innerHTML = html;
+    
+    // 绑定事件
+    document.getElementById('tradeFrom').addEventListener('change', updateTradePreview);
+    document.getElementById('tradeTo').addEventListener('change', updateTradePreview);
+    document.getElementById('tradeSlider').addEventListener('input', updateTradePreview);
+    document.getElementById('confirmTradeBtn').addEventListener('click', confirmTrade);
+}
+
+// 更新交易预览
+function updateTradePreview() {
+    var fromStat = document.getElementById('tradeFrom').value;
+    var toStat = document.getElementById('tradeTo').value;
+    var amount = parseInt(document.getElementById('tradeSlider').value);
+    
+    var sliderContainer = document.getElementById('sliderContainer');
+    var confirmBtn = document.getElementById('confirmTradeBtn');
+    var preview = document.getElementById('tradePreview');
+    var sliderValue = document.getElementById('sliderValue');
+    
+    if(!fromStat || !toStat || fromStat === toStat) {
+        sliderContainer.classList.add('hidden');
+        confirmBtn.disabled = true;
+        return;
+    }
+    
+    sliderContainer.classList.remove('hidden');
+    var maxAmount = Math.min(g[fromStat], 50);
+    document.getElementById('tradeSlider').max = maxAmount;
+    sliderValue.textContent = amount;
+    
+    if(amount === 0 || amount > g[fromStat]) {
+        confirmBtn.disabled = true;
+        preview.innerHTML = '<span style="color:#64748b;">请拖动滑块选择交易数量</span>';
+        return;
+    }
+    
+    confirmBtn.disabled = false;
+    var gain = Math.round(amount * 0.7);
+    var labels = {morale:'士气',trust:'信任',cash:'现金',hair:'发量'};
+    
+    var html = '<div style="text-align:center;">';
+    html += '<div style="font-size:1.2rem;margin-bottom:0.5rem;">';
+    html += '<span style="color:#dc2626;">-'+amount+'</span> '+labels[fromStat];
+    html += ' <span style="color:#64748b;margin:0 0.5rem;">→</span> ';
+    html += '<span style="color:#16a34a;">+'+gain+'</span> '+labels[toStat];
+    html += '</div>';
+    html += '<div style="font-size:0.75rem;color:#f59e0b;">⚠️ 损失30% ('+amount+' × 0.7 = '+gain+')</div>';
+    html += '</div>';
+    
+    preview.innerHTML = html;
+}
+
+// 确认交易
+function confirmTrade() {
+    var fromStat = document.getElementById('tradeFrom').value;
+    var toStat = document.getElementById('tradeTo').value;
+    var amount = parseInt(document.getElementById('tradeSlider').value);
+    
+    if(!fromStat || !toStat || amount <= 0 || amount > g[fromStat]) {
+        alert('交易参数错误!');
+        return;
+    }
+    
+    var gain = Math.round(amount * 0.7);
+    g[fromStat] = Math.max(0, g[fromStat] - amount);
+    g[toStat] = Math.min(g.teamMax, g[toStat] + gain);
+    
+    // 获取文案
+    var key = fromStat + '_' + toStat;
+    var exchange = SURVIVAL_EXCHANGE_MAP[key];
+    var title = exchange ? exchange.title : '数值交换';
+    var text = exchange ? exchange.text : '交易完成!';
+    
+    updateUI();
+    
+    var labels = {morale:'士气',trust:'信任',cash:'现金',hair:'发量'};
+    var msg = '✅ ' + title + '\n\n';
+    msg += '💬 "' + text + '"\n\n';
+    msg += '━━━━━━━━━━━━━━━\n';
+    msg += '📊 交易结果:\n';
+    msg += '• ' + labels[fromStat] + ': -' + amount + '\n';
+    msg += '• ' + labels[toStat] + ': +' + gain + '\n';
+    msg += '━━━━━━━━━━━━━━━';
+    
+    alert(msg);
+    showActWithStats();
+}
+
+// 保留旧函数作为兼容(不再使用)
+function showSurvivalOptions() {
+    showSurvivalSlider();
+}
+
+function handleSurvival(idx) {
+    // 已废弃
+}
+
+function handleAct(i) {
+    var acts = [Q1,Q2,Q3,Q4][g.q-1];
+    var c = acts[g.actIdx].choices[i];
+    if(c.type) g.selType = c.type;
+    applyEff(c.effects);
+    g.actIdx++;
+    updateUI();
+    setTimeout(function() { nextCard(); }, 200);
+}
+
+function nextQ() {
+    // 老产品自然衰减
+    g.products.forEach(function(p) {
+        if(p.status === 'live' && p.life > 0) {
+            p.life = Math.max(0, p.life - (p.decay || 10));
+            p.curU = Math.max(0, Math.round(p.curU * 0.92));
+            if(p.life <= 0) p.status = 'dead';
+        }
+    });
+    
+    g.q++;
+    if(g.q > 4) { 
+        finishYr(); 
+    } else { 
+        g.actIdx = 0; 
+        g.phase = 'event';
+        updateUI();
+        
+        // 如果有在线产品且不在Q1,进入运营阶段
+        var liveProds = g.products.filter(function(p) { return p.status === 'live' && p.life > 0; });
+        if(liveProds.length > 0 && g.q > 1) {
+            g.inOperation = true;
+            g.opIdx = 0;
+            showOperation();
+        } else {
+            setTimeout(function() { nextCard(); }, 300);
+        }
+    }
+}
+
+function showOperation() {
+    var liveProds = g.products.filter(function(p) { return p.status === 'live' && p.life > 0; });
+    
+    if(g.opIdx >= liveProds.length) {
+        // 运营结束,继续决策
+        g.inOperation = false;
+        updateUI();
+        setTimeout(function() { 
+            showTab('decision');
+            nextCard(); 
+        }, 300);
+        return;
+    }
+    
+    var prod = liveProds[g.opIdx];
+    
+    var html = '<div class="op-product-header">';
+    html += '<div class="op-product-name">《'+prod.name+'》运营决策</div>';
+    html += '<div class="op-product-stats">'+prod.type+' | 用户:'+prod.curU+'万 | 月流水:'+prod.curR+'万 | 生命周期:'+prod.life+'%</div>';
+    html += '</div>';
+    
+    html += '<div class="card"><h3>选择本季度运营策略</h3>';
+    for(var i=0; i<OPS.length; i++) {
+        var s = OPS[i];
+        html += '<div class="choice" data-op-index="'+i+'">';
+        html += '<div class="choice-label">'+s.title+'</div>';
+        html += '<div class="choice-desc">'+s.desc+'</div>';
+        html += '<div class="choice-effects">'+fmtOpEff(s.effects)+'</div>';
+        html += '</div>';
+    }
+    html += '</div>';
+    
+    document.getElementById('mainContent').innerHTML = html;
+    
+    var choices = document.querySelectorAll('.choice');
+    choices.forEach(function(choice) {
+        choice.addEventListener('click', function() {
+            var idx = parseInt(this.getAttribute('data-op-index'));
+            handleOp(idx);
+        });
+    });
+}
+
+function handleOp(i) {
+    var liveProds = g.products.filter(function(p) { return p.status === 'live' && p.life > 0; });
+    var prod = liveProds[g.opIdx];
+    var strategy = OPS[i];
+    
+    applyOpEff(prod, strategy.effects);
+    g.opIdx++;
+    updateUI();
+    setTimeout(function() { showOperation(); }, 200);
+}
+
+function applyOpEff(prod, eff) {
+    if(eff.userChange) prod.curU = Math.max(0, prod.curU + eff.userChange);
+    if(eff.revenueMultiplier) {
+        var arpu = prod.baseU > 0 ? prod.baseR / prod.baseU : 1;
+        prod.curR = Math.round(prod.curU * arpu * eff.revenueMultiplier);
+    }
+    if(eff.lifecycleChange) prod.life = Math.max(0, Math.min(prod.maxLife, prod.life + eff.lifecycleChange));
+    if(eff.cost) g.cash = Math.max(0, g.cash - eff.cost / 200);
+    
+    if(prod.life <= 0) prod.status = 'dead';
+}
+
+function finishYr() {
+    var typeConf = g.selType ? TYPES[g.selType] : {userMul:1,revMul:1,life:100,decay:10};
+    
+    // 用户量 = 创新度 + 期待值 (两者各占50%)
+    var userBase = (g.innovation * 0.5 + g.hype * 0.5);
+    var users = Math.round(userBase * 12 * typeConf.userMul);
+    
+    // 收入 = 用户量 × ARPU,ARPU主要取决于商业化
+    var arpu = Math.round(g.monetization * 0.8 + 10);
+    var rev = Math.round(users * arpu / 10 * typeConf.revMul);
+    
+    // 生命周期主要取决于可玩性
+    var lifeFactor = g.playability / 60; // 60分为基准
+    var baseLife = Math.round(typeConf.life * lifeFactor);
+    
+    g.cur.status = 'live';
+    g.cur.type = g.selType||'游戏';
+    g.cur.baseU = users;
+    g.cur.curU = users;
+    g.cur.baseR = rev;
+    g.cur.curR = rev;
+    g.cur.maxLife = baseLife;
+    g.cur.life = baseLife;
+    g.cur.decay = typeConf.decay;
+    
+    g.products.push(g.cur);
+    g.totalRev += rev;
+    g.totalUsers += users;
+    
+    // 成长机制
+    g.successfulProducts++;
+    var growthMultiplier = 1 + (g.successfulProducts * 0.35);
+    g.teamMax = Math.round(100 * growthMultiplier);
+    g.productMax = Math.round(100 * growthMultiplier);
+    g.effectMultiplier = 1 + (g.successfulProducts * 0.15);
+    
+    // 解锁运营系统
+    if(g.products.filter(function(p) { return p.status === 'live'; }).length > 0) {
+        document.getElementById('navOperation').classList.remove('hidden');
+    }
+    
+    showYrEnd(users, rev);
+}
+
+function showYrEnd(u, r) {
+    var lvl = LEVELS[g.level];
+    var prog = Math.min(100, Math.min((g.totalRev/lvl.rev)*100, (g.totalUsers/lvl.users)*100));
+    var desc = '《'+g.cur.name+'》上线了!首月'+u+'万用户,月流水'+r+'万。';
+    
+    if(prog >= 100 && lvl.next) {
+        g.level = lvl.next;
+        desc += '\n\n🎉恭喜升职加薪,现在是'+LEVELS[g.level].title+'了!';
+    } else {
+        desc += '\n\n继续卷吧,离晋升'+lvl.title+'还差一点...';
+    }
+    
+    // 显示成长信息
+    if(g.successfulProducts > 0) {
+        desc += '\n\n📈 你变强了!数值上限提升到'+g.teamMax+',但决策影响也增大了'+Math.round(g.effectMultiplier*100-100)+'%!';
+    }
+    
+    var html = '<div class="year-end">';
+    html += '<div style="font-size:2.5rem;margin-bottom:1rem;">🎉</div>';
+    html += '<div class="year-end-title">第'+g.year+'年年终总结</div>';
+    html += '<p style="color:#64748b;line-height:1.8;margin:1rem 0;">'+desc.replace(/\n/g,'<br>')+'</p>';
+    html += '<div class="year-end-metrics">';
+    html += '<div class="year-metric"><div class="year-metric-lbl">本年收入</div><div class="year-metric-val">'+r+'万</div></div>';
+    html += '<div class="year-metric"><div class="year-metric-lbl">本年用户</div><div class="year-metric-val">'+u+'万</div></div>';
+    html += '<div class="year-metric"><div class="year-metric-lbl">累计收入</div><div class="year-metric-val">'+g.totalRev+'万</div></div>';
+    html += '<div class="year-metric"><div class="year-metric-lbl">累计用户</div><div class="year-metric-val">'+g.totalUsers+'万</div></div>';
+    html += '</div>';
+    html += '<button class="btn btn-primary" id="nextYearBtn">开始第'+(g.year+1)+'年(继续卷)</button>';
+    html += '</div>';
+    document.getElementById('mainContent').innerHTML = html;
+    
+    document.getElementById('nextYearBtn').addEventListener('click', nextYear);
+}
+
+function nextYear() {
+    g.year++;
+    g.q = 1;
+    g.actIdx = 0;
+    g.phase = 'naming';
+    
+    // 重置数值,但保持上限
+    g.morale = 80;
+    g.trust = 80;
+    g.cash = 80;
+    g.hair = 80;
+    g.hype = 50;
+    g.innovation = 50;
+    g.playability = 50;
+    g.monetization = 50;
+    
+    g.currentNaming = '';
+    g.inOperation = false;
+    g.opIdx = 0;
+    g.survivalWarned = false;
+    updateUI();
+    showNaming();
+}
+
+function applyEff(eff) {
+    for(var k in eff) {
+        var v = eff[k];
+        if(typeof v === 'function') v = v();
+        
+        // 应用效果倍数
+        v = Math.round(v * g.effectMultiplier);
+        
+        if(k === 'morale' || k === 'trust' || k === 'cash' || k === 'hair') {
+            // 团队数值
+            if(g[k] !== undefined) {
+                g[k] = Math.max(0, Math.min(g.teamMax, g[k] + v));
+            }
+        } else if(k === 'hype' || k === 'innovation' || k === 'playability' || k === 'monetization') {
+            // 产品数值
+            if(g[k] !== undefined) {
+                g[k] = Math.max(0, Math.min(g.productMax, g[k] + v));
+            }
+        }
+    }
+    checkSurv();
+}
+
+function checkSurv() {
+    var stats = {'士气':g.morale,'信任':g.trust,'现金':g.cash,'发量':g.hair};
+    var dangerStats = [];
+    
+    // 检查危险数值
+    for(var s in stats) {
+        if(stats[s] <= 20 && stats[s] > 0) {
+            dangerStats.push(s + ':' + stats[s]);
+        }
+        if(stats[s] <= 0) {
+            g.over = true;
+            var msg = '💀 '+s+'归零!\n\n';
+            msg += '━━━━━━━━━━━━━━━\n';
+            msg += '游戏结束 - 项目被砍,你被开除!\n';
+            msg += '━━━━━━━━━━━━━━━\n\n';
+            msg += '📊 最终成绩:\n';
+            msg += '• 累计收入: '+g.totalRev+'万\n';
+            msg += '• 累计用户: '+g.totalUsers+'万\n';
+            msg += '• 存活时间: 第'+g.year+'年 Q'+g.q+'\n';
+            msg += '• 成功产品: '+g.successfulProducts+'款\n\n';
+            msg += '━━━━━━━━━━━━━━━\n';
+            msg += '💡 提示:\n';
+            msg += '使用【⚡续命机制】可以在危急时刻\n';
+            msg += '互换数值救急!点击决策界面的\n';
+            msg += '红色续命按钮即可使用。\n';
+            msg += '━━━━━━━━━━━━━━━\n\n';
+            msg += '3秒后自动重新开始...';
+            alert(msg);
+            
+            setTimeout(function() {
+                location.reload();
+            }, 3000);
+            return;
+        }
+    }
+    
+    // 如果有危险数值,弹出提示
+    if(dangerStats.length > 0 && !g.survivalWarned) {
+        g.survivalWarned = true;
+        setTimeout(function() {
+            var warnMsg = '⚠️ 危险警告!\n\n';
+            warnMsg += dangerStats.join(', ') + '\n\n';
+            warnMsg += '数值即将归零!\n';
+            warnMsg += '建议立即使用【⚡续命机制】\n';
+            warnMsg += '互换数值救急!';
+            alert(warnMsg);
+            g.survivalWarned = false;
+        }, 500);
+    }
+}
+
+function updateUI() {
+    var lvl = LEVELS[g.level];
+    document.getElementById('careerLevel').textContent = g.level;
+    document.getElementById('careerTitle').textContent = lvl.title;
+    document.getElementById('quarter').textContent = 'Q' + g.q;
+    document.getElementById('year').textContent = g.year;
+    document.getElementById('miniRev').textContent = g.totalRev;
+    document.getElementById('miniUsers').textContent = g.totalUsers;
+    
+    var liveCount = g.products.filter(function(p) { return p.status === 'live'; }).length;
+    document.getElementById('miniProducts').textContent = liveCount;
+    
+    var qInc = g.products.filter(function(p) { return p.status === 'live'; }).reduce(function(s,p) { return s + p.curR; }, 0);
+    document.getElementById('miniQRev').textContent = qInc;
+}
+
+function showProducts() {
+    var html = '';
+    if(g.cur && g.cur.status === 'dev') {
+        html += '<div class="product-card" style="border-color:#16a34a;border-style:dashed;">';
+        html += '<div class="product-header"><div class="product-name">'+g.cur.name+'</div><div class="product-status" style="background:rgba(37,99,235,0.1);color:#2563eb;">开发中Q'+g.q+'</div></div>';
+        html += '<div style="font-size:0.8rem;color:#64748b;margin-top:0.3rem;">正在肝...</div>';
+        html += '</div>';
+    }
+    
+    g.products.forEach(function(p) {
+        var statusClass = p.status === 'live' ? 'status-live' : '';
+        var statusText = p.status === 'live' ? '运营中' : '已停运';
+        html += '<div class="product-card">';
+        html += '<div class="product-header"><div><div class="product-name">'+p.name+'</div><div style="font-size:0.75rem;color:#64748b;margin-top:0.2rem;">'+p.type+'</div></div><div class="product-status '+statusClass+'">'+statusText+'</div></div>';
+        html += '<div style="font-size:0.8rem;color:#64748b;margin-top:0.5rem;">用户:'+p.curU+'万 | 月流水:'+p.curR+'万 | 剩余生命:'+p.life+'%</div>';
+        html += '</div>';
+    });
+    
+    if(!html) {
+        html = '<div class="card"><p style="text-align:center;color:#64748b;">还没有产品,快去做一个吧!</p></div>';
+    }
+    
+    document.getElementById('mainContent').innerHTML = html;
+}
+
+// 格式化效果 - 分行显示正负
+function fmtEffSeparate(eff) {
+    var lbl = {morale:'士气',trust:'信任',cash:'现金',hair:'发量',hype:'期待',innovation:'创新',playability:'可玩性',monetization:'商业化'};
+    var positive = '';
+    var negative = '';
+    
+    for(var k in eff) {
+        if(typeof eff[k] === 'function') continue;
+        var v = Math.round(eff[k] * g.effectMultiplier);
+        if(v > 0) {
+            positive += '<span class="effect-tag effect-positive">'+(lbl[k]||k)+' +'+v+'</span>';
+        } else if(v < 0) {
+            negative += '<span class="effect-tag effect-negative">'+(lbl[k]||k)+' '+v+'</span>';
+        }
+    }
+    
+    var html = '';
+    if(positive) {
+        html += '<div class="effects-row"><span class="effects-label" style="color:#16a34a;">✓ 加分:</span>'+positive+'</div>';
+    }
+    if(negative) {
+        html += '<div class="effects-row"><span class="effects-label" style="color:#dc2626;">✗ 减分:</span>'+negative+'</div>';
+    }
+    
+    return html || '<span style="color:#64748b;font-size:0.75rem;">无影响</span>';
+}
+
+function fmtOpEff(eff) {
+    var html = '';
+    if(eff.userChange) html += '<span class="effect-tag '+(eff.userChange>0?'effect-positive':'effect-negative')+'">用户 '+(eff.userChange>0?'+':'')+eff.userChange+'万</span>';
+    if(eff.revenueMultiplier) html += '<span class="effect-tag '+(eff.revenueMultiplier>1?'effect-positive':'effect-negative')+'">流水 ×'+eff.revenueMultiplier+'</span>';
+    if(eff.lifecycleChange) html += '<span class="effect-tag '+(eff.lifecycleChange>0?'effect-positive':'effect-negative')+'">生命 '+(eff.lifecycleChange>0?'+':'')+eff.lifecycleChange+'%</span>';
+    if(eff.cost) html += '<span class="effect-tag effect-negative">成本 -'+eff.cost+'万</span>';
+    return html;
+}
+</script>
+</body>
+</html>
